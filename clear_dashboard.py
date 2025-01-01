@@ -9,6 +9,54 @@ os.chdir(os.path.dirname(__file__))
 # Set page configuration
 st.set_page_config(page_title="CLEAR Dashboard", layout="wide")
 
+# Initial Landing Page
+if "start" not in st.session_state:
+    st.session_state.start = False
+
+if not st.session_state.start:
+    col_logo, col_title = st.columns([1, 4])
+    with col_logo:
+        st.image("CLEAR_LOGO.png", width=100)
+    with col_title:
+        st.title("Welcome to the CLEAR Dashboard")
+
+    st.markdown(
+        """
+        ### About CLEAR
+        CLEAR (Compliance, Lifecycle, Emissions, Analysis, and Reporting) is a cutting-edge decision-making tool designed
+        to help industries streamline their sustainability and compliance strategies.
+        
+        It provides an integrated platform for:
+        - **Analyzing environmental impacts**
+        - **Estimating financial costs**, including carbon taxes
+        - **Ensuring regulatory compliance** with frameworks like CBAM, REACH, and more.
+
+        By connecting to the most up-to-date Life Cycle Assessment (LCA) and regulatory databases, CLEAR ensures users always
+        work with the latest and most accurate information.
+
+        ### About Dr. Avi Luvchik
+        Avi  is an internationally recognized expert in sustainability and environmental compliance. With over 
+        20 years of experience, he has advised top organizations across various industries. His expertise spans life cycle 
+        assessments, emissions reduction, and corporate sustainability strategies. Dr. Luvchik is the founder of CLEAR and 
+        continues to innovate solutions to tackle global environmental challenges.
+        """
+    )
+
+    # Footer and Button Section
+    st.write("---")
+    if st.button("Let's Get Started"):
+        st.session_state.start = True
+
+    st.markdown(
+        """
+        **CLEAR v1.0**  
+        Tool developed by Dr. Avi Luvchik  
+        @ All rights reserved
+        """,
+        unsafe_allow_html=True
+    )
+    st.stop()
+
 # Load dataset
 @st.cache_data
 def load_data(file_path):
@@ -18,8 +66,21 @@ def load_data(file_path):
         st.error(f"File not found: {file_path}")
         return pd.DataFrame()
 
-data_file = "sano_lca_products.csv"
-data = load_data(data_file)
+@st.cache_data
+def process_uploaded_data(uploaded_file):
+    try:
+        return pd.read_csv(uploaded_file)
+    except Exception as e:
+        st.error(f"Error reading file: {e}")
+        return pd.DataFrame()
+
+# Sidebar Data Upload
+st.sidebar.header("Data Management")
+data_file = st.sidebar.file_uploader("Upload a CSV File", type=["csv"])
+if data_file:
+    data = process_uploaded_data(data_file)
+else:
+    data = load_data("sano_lca_products.csv")
 
 if data.empty:
     st.error("Dataset could not be loaded. Please ensure the CSV file is available.")
@@ -29,11 +90,11 @@ if data.empty:
 col_logo, col_title = st.columns([1, 4])
 with col_logo:
     try:
-        st.image("CLEAR_LOGO.png", width=100)  # Replace with the correct file name
+        st.image("client_logo.png", width=140)  # Display client logo
     except FileNotFoundError:
-        st.error("Logo image not found!")
+        st.warning("Client logo not found. Please upload a valid logo file.")
 with col_title:
-    st.title("CLEAR: Compliance, Lifecycle, Emissions, Analysis, Reporting")
+    pass  # Remove the CLEAR title after starting the application
 
 # Sidebar Navigation
 st.sidebar.header("Navigation")
@@ -134,9 +195,43 @@ elif selected_tab == "Financial Analysis":
 # Regulatory Compliance Tab
 elif selected_tab == "Regulatory Compliance":
     st.header("📜 Regulatory Compliance Tools")
-    st.write("This section will include compliance evaluation and rule enforcement tools.")
+
+    # Regulatory Summary Table
+    st.subheader("Relevant Regulations for the Chemical Sector")
+    regulations = pd.DataFrame({
+        "Regulation Name": [
+            "CBAM (Carbon Border Adjustment Mechanism)",
+            "TSCA (Toxic Substances Control Act)",
+            "REACH (Registration, Evaluation, Authorization, and Restriction of Chemicals)",
+            "GHS (Globally Harmonized System)",
+            "EPA Clean Air Act"
+        ],
+        "Region": ["European Union", "United States", "European Union", "International", "United States"],
+        "Exposure Level (1-10)": [10, 7, 9, 6, 5],
+        "Description": [
+            "Imposes a carbon tax on imported goods based on their embedded emissions.",
+            "Regulates the introduction and use of new or existing chemicals.",
+            "Ensures high levels of health and environmental protection by tracking chemicals.",
+            "Standardizes classification and labeling of chemicals globally.",
+            "Limits emissions of hazardous air pollutants."
+        ]
+    })
+    st.dataframe(regulations)
+
+    # Bar Chart for Exposure Levels
+    st.subheader("Exposure Levels by Regulation")
+    exposure_chart = px.bar(
+        regulations,
+        x="Regulation Name",
+        y="Exposure Level (1-10)",
+        title="Regulatory Exposure Levels",
+        labels={"Regulation Name": "Regulation", "Exposure Level (1-10)": "Exposure Level"},
+        color="Exposure Level (1-10)",
+        color_continuous_scale=px.colors.sequential.Emrld
+    )
+    st.plotly_chart(exposure_chart, use_container_width=True)
 
 # Footer Attribution
 st.write("---")
 st.write("**CLEAR v1.0**")
-st.write("Tool created by Dr. Avi Luvchik. All rights reserved.")
+st.write("The CLEAR tool created by Dr. Avi Luvchik @ All rights reserved.")
