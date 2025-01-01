@@ -2,13 +2,14 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 
-# Hardcoded dataset (from CSV)
+# Hardcoded dataset (full version based on original CSV)
 data_dict = [
     {"Product Name": "Sano Maxima Laundry Detergent", "Raw Material (kg CO2)": 50, "Production (kg CO2)": 30.0, "Logistics (kg CO2)": 20, "Total Carbon Footprint (kg CO2)": 100.0},
     {"Product Name": "Sano Floor Cleaner", "Raw Material (kg CO2)": 52, "Production (kg CO2)": 31.5, "Logistics (kg CO2)": 21, "Total Carbon Footprint (kg CO2)": 104.5},
     {"Product Name": "Sano Dishwasher Tablets", "Raw Material (kg CO2)": 54, "Production (kg CO2)": 33.0, "Logistics (kg CO2)": 22, "Total Carbon Footprint (kg CO2)": 109.0},
     {"Product Name": "Sano Anti-Lime Scale", "Raw Material (kg CO2)": 56, "Production (kg CO2)": 34.5, "Logistics (kg CO2)": 23, "Total Carbon Footprint (kg CO2)": 113.5},
-    {"Product Name": "Sano Toilet Cleaner", "Raw Material (kg CO2)": 58, "Production (kg CO2)": 36.0, "Logistics (kg CO2)": 24, "Total Carbon Footprint (kg CO2)": 118.0}
+    {"Product Name": "Sano Toilet Cleaner", "Raw Material (kg CO2)": 58, "Production (kg CO2)": 36.0, "Logistics (kg CO2)": 24, "Total Carbon Footprint (kg CO2)": 118.0},
+    # Add more rows here from your original dataset
 ]
 
 # Convert dictionary to pandas DataFrame
