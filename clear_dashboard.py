@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import requests  # To interact with the CBAM audit system
 
 # Automatically change the working directory to the script's directory
 os.chdir(os.path.dirname(__file__))
@@ -98,7 +99,7 @@ with col_title:
 
 # Sidebar Navigation
 st.sidebar.header("Navigation")
-selected_tab = st.sidebar.radio("Select a tab:", ["Environmental Analysis", "Financial Analysis", "Regulatory Compliance"])
+selected_tab = st.sidebar.radio("Select a tab:", ["Environmental Analysis", "Financial Analysis", "Regulatory Compliance", "Audit Progress"])
 
 # Environmental Analysis Tab
 if selected_tab == "Environmental Analysis":
@@ -230,6 +231,23 @@ elif selected_tab == "Regulatory Compliance":
         color_continuous_scale=px.colors.sequential.Emrld
     )
     st.plotly_chart(exposure_chart, use_container_width=True)
+
+# Audit Progress Tab
+elif selected_tab == "Audit Progress":
+    st.header("🔍 Audit Progress")
+
+    # Fetch data from the CBAM audit system
+    try:
+        response = requests.get("http://127.0.0.1:5001/compliance_dashboard")
+        if response.status_code == 200:
+            dashboard_data = response.json()["dashboard"]
+            st.metric(label="Total Submissions", value=dashboard_data["total_submissions"])
+            st.metric(label="Approved Submissions", value=dashboard_data["approved"])
+            st.metric(label="Pending Submissions", value=dashboard_data["pending"])
+        else:
+            st.error("Failed to fetch audit progress data.")
+    except Exception as e:
+        st.error(f"Error connecting to the audit system: {e}")
 
 # Footer Attribution
 st.write("---")
