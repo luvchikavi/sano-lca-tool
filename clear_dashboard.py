@@ -24,13 +24,14 @@ if not st.session_state.start:
     st.markdown(
         """
         ### About CLEAR
-        CLEAR (Compliance, Lifecycle, Emissions, Analysis, and Reporting) is a cutting-edge decision-making tool designed
+        CLEAR (Compliance, Lifecycle Emissions Analysis, and Reporting) is a cutting-edge decision-making tool designed
         to help industries streamline their sustainability and compliance strategies.
         
         It provides an integrated platform for:
         - **Analyzing environmental impacts**
         - **Estimating financial costs**, including carbon taxes
         - **Ensuring regulatory compliance** with frameworks like CBAM, REACH, and more.
+        - **Model Simultaion** for better decision making and reliable results. 
 
         By connecting to the most up-to-date Life Cycle Assessment (LCA) and regulatory databases, CLEAR ensures users always
         work with the latest and most accurate information.
