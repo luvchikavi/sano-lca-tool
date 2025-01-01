@@ -252,4 +252,4 @@ elif selected_tab == "Audit Progress":
 # Footer Attribution
 st.write("---")
 st.write("**CLEAR v1.0**")
-st.write("The CLEAR tool created by Dr. Avi Luvchik @ All rights reserved.")
+st.write("The CLEAR created by Dr. Avi Luvchik @ All rights reserved.")
