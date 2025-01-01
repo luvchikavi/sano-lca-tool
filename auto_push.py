@@ -46,3 +46,4 @@ if __name__ == "__main__":
     # Ensure we're in the correct directory
     os.chdir(repo_path)
     watch_files()
+
