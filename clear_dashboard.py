@@ -2,7 +2,8 @@ import os
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-import requests  # To interact with the CBAM audit system
+import json  # For handling audit data
+from datetime import datetime  # For timestamps
 
 # Automatically change the working directory to the script's directory
 os.chdir(os.path.dirname(__file__))
@@ -233,24 +234,57 @@ elif selected_tab == "Regulatory Compliance":
     )
     st.plotly_chart(exposure_chart, use_container_width=True)
 
-# Audit Progress Tab
+# Audit Progress Tab with JSON storage
 elif selected_tab == "Audit Progress":
     st.header("🔍 Audit Progress")
 
-    # Fetch data from the CBAM audit system
-    try:
-        response = requests.get("http://127.0.0.1:5001/compliance_dashboard")
-        if response.status_code == 200:
-            dashboard_data = response.json()["dashboard"]
-            st.metric(label="Total Submissions", value=dashboard_data["total_submissions"])
-            st.metric(label="Approved Submissions", value=dashboard_data["approved"])
-            st.metric(label="Pending Submissions", value=dashboard_data["pending"])
-        else:
-            st.error("Failed to fetch audit progress data.")
-    except Exception as e:
-        st.error(f"Error connecting to the audit system: {e}")
+    # Path to the audit data file
+    audit_file = "audit_data.json"
+
+    # Load existing audit data
+    if os.path.exists(audit_file):
+        with open(audit_file, "r") as f:
+            audit_data = json.load(f)
+    else:
+        audit_data = []
+
+    # Submit new data
+    with st.form("submit_audit_form"):
+        client_id = st.text_input("Client ID")
+        emissions = st.number_input("Emissions (kg CO2)", min_value=0.0)
+        compliance_doc = st.text_input("Compliance Document ID")
+        submitted = st.form_submit_button("Submit")
+
+        if submitted:
+            new_entry = {
+                "client_id": client_id,
+                "emissions": emissions,
+                "compliance_doc": compliance_doc,
+                "status": "Pending",
+                "timestamp": datetime.now().isoformat()
+            }
+            audit_data.append(new_entry)
+            with open(audit_file, "w") as f:
+                json.dump(audit_data, f, indent=4)
+            st.success("Data submitted successfully!")
+
+    # Display audit data
+    st.subheader("Audit Submissions")
+    if audit_data:
+        df = pd.DataFrame(audit_data)
+        st.dataframe(df)
+
+        # Approve submissions
+        selected_submission = st.selectbox("Select Submission to Approve", range(len(audit_data)))
+        if st.button("Approve Submission"):
+            audit_data[selected_submission]["status"] = "Approved"
+            with open(audit_file, "w") as f:
+                json.dump(audit_data, f, indent=4)
+            st.success("Submission approved successfully!")
+    else:
+        st.info("No audit submissions yet.")
 
 # Footer Attribution
 st.write("---")
 st.write("**CLEAR v1.0**")
-st.write("The CLEAR created by Dr. Avi Luvchik @ All rights reserved.")
+st.write("The CLEAR tool created by Dr. Avi Luvchik @ All rights reserved.")
